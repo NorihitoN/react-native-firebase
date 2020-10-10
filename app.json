@@ -21,6 +21,18 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "firebase": {
+        "apiKey": "AIzaSyA3Tt2PBNogqtnrZvVBcX8QV1RZLzz692g",
+        "authDomain": "shop-review-5dd35.firebaseapp.com",
+        "databaseURL": "https://shop-review-5dd35.firebaseio.com",
+        "projectId": "shop-review-5dd35",
+        "storageBucket": "shop-review-5dd35.appspot.com",
+        "messagingSenderId": "536364539812",
+        "appId": "1:536364539812:web:f2876d29913b09ea8c6b31",
+        "measurementId": "G-M84RGXQHX9"
+      }
     }
   }
 }
