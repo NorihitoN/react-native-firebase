@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView } from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, Platform } from 'react-native';
 
 /* lib */
 import { getShops } from "./src/lib/firebase";
@@ -34,6 +34,7 @@ export default function App() {
         keyExtractor={(item, index) => index.toString()}
         numColumns={2}
       />
+      <StatusBar style="auto" />
     </SafeAreaView>
   );
 }
@@ -44,5 +45,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    paddingTop: Platform.OS === "android" ? 25 : 0
   },
 });
