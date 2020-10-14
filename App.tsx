@@ -25,7 +25,7 @@ export default function App() {
   };
 
   const shopItems = shops.map((shop, index) => (
-    <View style={{margin: 10}} key={index.toString()}>
+    <View style={{ margin: 10 }} key={index.toString()}>
       <Text>{shop.name}</Text>
       <Text>{shop.place}</Text>
     </View>
