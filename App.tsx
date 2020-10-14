@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import * as firebase from 'firebase';
-import "firebase/firestore";
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, Platform } from 'react-native';
 
 /* lib */
 import { getShops } from "./src/lib/firebase";
+/* component */
+import { ShopReviewItem } from "./src/components/ShopReviewItem";
 /* types */
 import { Shop } from "./src/types/shop";
 
@@ -24,18 +24,18 @@ export default function App() {
     setShops(shops);
   };
 
-  const shopItems = shops.map((shop, index) => (
-    <View style={{ margin: 10 }} key={index.toString()}>
-      <Text>{shop.name}</Text>
-      <Text>{shop.place}</Text>
-    </View>
-  ));
-
   return (
-    <View style={styles.container}>
-      {shopItems}
+    <SafeAreaView style={styles.container}>
+      <FlatList 
+        data={shops}
+        renderItem={({item}: { item: Shop}) => (
+          <ShopReviewItem shop={item} />
+        )}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={2}
+      />
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -45,5 +45,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    paddingTop: Platform.OS === "android" ? 25 : 0
   },
 });
