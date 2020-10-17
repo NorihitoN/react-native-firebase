@@ -11,8 +11,12 @@ import { Shop } from "../types/shop";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from "../types/navigation";
 
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList, "Home">;
+}
 
-export const HomeScreen = ({navigation}) => {
+
+export const HomeScreen = ({navigation}: Props) => {
 
   const [shops, setShops] = useState<Shop[]>([]);
   useEffect(() => {
@@ -24,8 +28,8 @@ export const HomeScreen = ({navigation}) => {
     setShops(shops);
   };
 
-  const onPressShop = () => {
-     navigation.navigate("Shop") ;
+  const onPressShop = (shop: Shop) => {
+     navigation.navigate("Shop", { shop }) ;
   }
 
   return (
@@ -33,7 +37,7 @@ export const HomeScreen = ({navigation}) => {
       <FlatList 
         data={shops}
         renderItem={({item}:{item: Shop}) => (
-          <ShopReviewItem shop={item} onPress={onPressShop} />
+          <ShopReviewItem shop={item} onPress={() => onPressShop(item)} />
         )}
         keyExtractor={(item, index) => index.toString()}
         numColumns={2}
