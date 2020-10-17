@@ -8,11 +8,11 @@ import { getShops } from "../lib/firebase";
 import { ShopReviewItem } from "../components/ShopReviewItem";
 /* types */
 import { Shop } from "../types/shop";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from "../types/navigation";
 
-export const HomeScreen = () => {
-  // Ingnore setting timer warning
-  // See https://github.com/facebook/react-native/issues/12981
-  console.ignoredYellowBox = ['Setting a timer'];
+
+export const HomeScreen = ({navigation}) => {
 
   const [shops, setShops] = useState<Shop[]>([]);
   useEffect(() => {
@@ -24,12 +24,16 @@ export const HomeScreen = () => {
     setShops(shops);
   };
 
+  const onPressShop = () => {
+     navigation.navigate("Shop") ;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList 
         data={shops}
-        renderItem={({item}: { item: Shop}) => (
-          <ShopReviewItem shop={item} />
+        renderItem={({item}:{item: Shop}) => (
+          <ShopReviewItem shop={item} onPress={onPressShop} />
         )}
         keyExtractor={(item, index) => index.toString()}
         numColumns={2}
