@@ -1,10 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { StyleSheet, SafeAreaView, Text } from "react-native";
 import { IconButton } from "../components/IconButton";
+import { TextArea } from "../components/TextArea";
+import { StarInput } from "../components/StarInput";
+import { Button } from "../components/Button";
+import { addReview } from "../lib/firebase";
+import { UserContext } from "../contexts/userContext";
+import firebase from "firebase";
 /* types */
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/navigation";
 import { RouteProp } from "@react-navigation/native";
+import { Review } from "../types/review";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "CreateReview">;
@@ -16,6 +23,27 @@ export const CreateReviewScreen: React.FC<Props> = ({
   route,
 }: Props) => {
   const { shop } = route.params;
+  const [text, setText] = useState<string>("");
+  const [score, setScore] = useState<number>(3);
+  const { user } = useContext(UserContext);
+
+  const onSubmit = async () => {
+    const review = {
+      user: {
+        name: user.name,
+        id: user.id
+      },
+      shop: {
+        name: shop.name,
+        id: shop.id,
+      },
+      text,
+      score,
+      updatedAt: firebase.firestore.Timestamp.now(),
+      createdAt: firebase.firestore.Timestamp.now(),
+    } as Review;
+    await addReview(shop.id, review);
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -28,7 +56,14 @@ export const CreateReviewScreen: React.FC<Props> = ({
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>CreateReview Screen</Text>
+      <StarInput score={score} onChangeScore={(value) => setScore(value)} />
+      <TextArea
+        value={text}
+        onChangeText={(value) => setText(value)}
+        label="レビュー"
+        placeholder="レビューを書いてください "
+      />
+      <Button text="レビューを投稿する" onPress={onSubmit}/>
     </SafeAreaView>
   );
 };
@@ -37,8 +72,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
   },
 });

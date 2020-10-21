@@ -10,11 +10,11 @@ type Props = {
 };
 
 export const Loading = ({ visible = false }: Props) => {
-  return (
+  return visible? (
     <View style={styles.container}>
-      <ActivityIndicator size="large"/>
+      <ActivityIndicator size="large" color="#0000ff"/>
     </View>
-  );
+  ) : null;
 };
 
 const styles = StyleSheet.create({
