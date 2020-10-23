@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
-import { StyleSheet, SafeAreaView, Text } from "react-native";
+import { StyleSheet, SafeAreaView, Text, View , Image, Alert} from "react-native";
 import { IconButton } from "../components/IconButton";
 import { TextArea } from "../components/TextArea";
 import { StarInput } from "../components/StarInput";
 import { Button } from "../components/Button";
-import { addReview } from "../lib/firebase";
+import { Loading } from "../components/Loading";
+import { createReviewRef, uploadImage } from "../lib/firebase";
+import { pickImage } from "../lib/image-picker";
 import { UserContext } from "../contexts/userContext";
 import firebase from "firebase";
 /* types */
@@ -12,6 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/navigation";
 import { RouteProp } from "@react-navigation/native";
 import { Review } from "../types/review";
+import { getExtension } from "../utils/file";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "CreateReview">;
@@ -25,9 +28,26 @@ export const CreateReviewScreen: React.FC<Props> = ({
   const { shop } = route.params;
   const [text, setText] = useState<string>("");
   const [score, setScore] = useState<number>(3);
+  const [imageUri, setImageUri] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const { user } = useContext(UserContext);
 
   const onSubmit = async () => {
+    if(!text || !imageUri) {
+      Alert.alert("レビューまたは画像がありません。");
+    }
+    setLoading(true);
+    // document のidを取得
+    const reviewDocRef = await createReviewRef(shop.id);
+    console.log("shop review doc");
+    console.log(reviewDocRef);
+    console.log(reviewDocRef.id);
+    // storageのpathを決定
+    const ext = getExtension(imageUri);
+    const storagePath = `reviews/${reviewDocRef.id}.${ext}`;
+    //　画像をstorageのアップロード
+    const downloadUrl = await uploadImage(imageUri, storagePath);
+    // reveiwドキュメントを作る
     const review = {
       user: {
         name: user.name,
@@ -39,10 +59,13 @@ export const CreateReviewScreen: React.FC<Props> = ({
       },
       text,
       score,
+      imageUrl: downloadUrl,
       updatedAt: firebase.firestore.Timestamp.now(),
       createdAt: firebase.firestore.Timestamp.now(),
     } as Review;
-    await addReview(shop.id, review);
+    await reviewDocRef.set(review);
+    setLoading(false);
+    navigation.goBack();
   };
 
   useEffect(() => {
@@ -54,6 +77,11 @@ export const CreateReviewScreen: React.FC<Props> = ({
     });
   }, [shop]);
 
+  const onPickImage = async () => {
+    const uri = await pickImage();
+    setImageUri(uri);
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StarInput score={score} onChangeScore={(value) => setScore(value)} />
@@ -63,7 +91,12 @@ export const CreateReviewScreen: React.FC<Props> = ({
         label="レビュー"
         placeholder="レビューを書いてください "
       />
+      <View style={styles.photoContainer}>
+        <IconButton name="camera" onPress={onPickImage} color="#ccc" />
+        {!!imageUri && <Image source={{uri: imageUri}} style={styles.image} />}
+      </View>
       <Button text="レビューを投稿する" onPress={onSubmit}/>
+      <Loading visible={loading} />
     </SafeAreaView>
   );
 };
@@ -73,4 +106,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  photoContainer: {
+    margin: 0,
+  },
+  image: {
+    width: 100,
+    height: 100,
+  }
 });
