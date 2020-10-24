@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
     paddingTop: Platform.OS === "android" ? 25 : 0
   },
 });

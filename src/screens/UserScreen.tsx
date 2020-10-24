@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { StyleSheet, SafeAreaView, Text } from "react-native";
+import { StyleSheet, SafeAreaView, Text, Platform } from "react-native";
 import { updateUser } from "../lib/firebase";
 import firebase from "firebase";
 /* types */
@@ -52,5 +52,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: Platform.OS === "android" ? 25 : 0
   },
 });
