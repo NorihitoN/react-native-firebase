@@ -46,14 +46,13 @@ export const updateUser = async (userId: string, params: any) => {
 };
 
 export const createReviewRef = async (shopId: string) => {
-   return await firebase
+  return await firebase
     .firestore()
     .collection("shops")
     .doc(shopId)
     .collection("reviews")
-    .doc()
+    .doc();
 };
-
 
 export const uploadImage = async (uri: string, path: string) => {
   // uri => blob
@@ -68,8 +67,21 @@ export const uploadImage = async (uri: string, path: string) => {
     await ref.put(blob);
     downloadUrl = await ref.getDownloadURL();
     console.log(downloadUrl);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
   return downloadUrl;
-}
+};
+
+export const getReviews = async (shopId: string) => {
+  const reviewDocs = await firebase
+    .firestore()
+    .collection("shops")
+    .doc(shopId)
+    .collection("reviews")
+    .orderBy("createdAt", "desc")
+    .get();
+  return reviewDocs.docs.map(
+    (doc) => ({ ...doc.data(), id: doc.id } as Review)
+  );
+};

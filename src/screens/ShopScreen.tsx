@@ -4,8 +4,12 @@ import { StyleSheet, SafeAreaView, Text } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/navigation";
 import { RouteProp } from "@react-navigation/native";
+import { Review } from "../types/review";
 import { ShopDetail } from "../components/ShopDetail";
 import { FloatingActionButton } from "../components/FloatingActionButton";
+import { ReviewItem } from "../components/ReviewItem";
+import { getReviews } from "../lib/firebase";
+import { FlatList } from "react-native-gesture-handler";
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "Shop">;
@@ -14,14 +18,26 @@ type Props = {
 
 export const ShopScreen: React.FC<Props> = ({ navigation, route }: Props) => {
   const { shop } = route.params;
+  const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
     navigation.setOptions({ title: shop.name });
+
+    const fetchReviews = async () => {
+      const reviews = await getReviews(shop.id);
+      setReviews(reviews);
+    };
+    fetchReviews();
   }, [shop]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ShopDetail shop={shop} />
+      <FlatList
+        ListHeaderComponent={<ShopDetail shop={shop} />}
+        data={reviews}
+        renderItem={({ item }) => <ReviewItem review={item} />}
+        keyExtractor={(item) => item.id}
+      />
       <FloatingActionButton
         iconName="plus"
         onPress={() => navigation.navigate("CreateReview", { shop })}
