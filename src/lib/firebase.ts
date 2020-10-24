@@ -59,14 +59,10 @@ export const uploadImage = async (uri: string, path: string) => {
   const localUri = await fetch(uri);
   const blob = await localUri.blob();
   const ref = firebase.storage().ref().child(path);
-
-  console.log("storage ref");
-
   let downloadUrl = "";
   try {
     await ref.put(blob);
     downloadUrl = await ref.getDownloadURL();
-    console.log(downloadUrl);
   } catch (err) {
     console.log(err);
   }

@@ -8,6 +8,7 @@ import { Loading } from "../components/Loading";
 import { createReviewRef, uploadImage } from "../lib/firebase";
 import { pickImage } from "../lib/image-picker";
 import { UserContext } from "../contexts/userContext";
+import { ReviewContext } from "../contexts/reviewContext";
 import firebase from "firebase";
 /* types */
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -31,17 +32,16 @@ export const CreateReviewScreen: React.FC<Props> = ({
   const [imageUri, setImageUri] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useContext(UserContext);
+  const { reviews, setReviews } = useContext(ReviewContext);
 
   const onSubmit = async () => {
     if(!text || !imageUri) {
       Alert.alert("レビューまたは画像がありません。");
+      return;
     }
     setLoading(true);
     // document のidを取得
     const reviewDocRef = await createReviewRef(shop.id);
-    console.log("shop review doc");
-    console.log(reviewDocRef);
-    console.log(reviewDocRef.id);
     // storageのpathを決定
     const ext = getExtension(imageUri);
     const storagePath = `reviews/${reviewDocRef.id}.${ext}`;
@@ -49,6 +49,7 @@ export const CreateReviewScreen: React.FC<Props> = ({
     const downloadUrl = await uploadImage(imageUri, storagePath);
     // reveiwドキュメントを作る
     const review = {
+      id: reviewDocRef.id,
       user: {
         name: user.name,
         id: user.id
@@ -64,6 +65,7 @@ export const CreateReviewScreen: React.FC<Props> = ({
       createdAt: firebase.firestore.Timestamp.now(),
     } as Review;
     await reviewDocRef.set(review);
+    setReviews([review, ...reviews]);
     setLoading(false);
     navigation.goBack();
   };
