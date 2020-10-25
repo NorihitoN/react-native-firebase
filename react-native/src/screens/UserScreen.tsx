@@ -21,7 +21,6 @@ type Props = {
 
 export const UserScreen: React.FC<Props> = ({ navigation, route }: Props) => {
   const { user, setUser } = useContext(UserContext);
-  console.log(user.name);
   const [name, setName] = useState<string>(user.name);
   const [loading, setLoading] = useState<boolean>(false);
   

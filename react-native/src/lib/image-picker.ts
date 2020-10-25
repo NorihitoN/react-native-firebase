@@ -20,7 +20,6 @@ export const pickImage = async () => {
       allowsEditing: false,
     });
     if(!result.cancelled){
-        console.log(result);
         return result.uri;
     }
 
