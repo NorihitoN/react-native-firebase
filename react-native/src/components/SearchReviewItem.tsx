@@ -10,18 +10,19 @@ type Props = {
   review: Review;
 };
 
-export const ReviewItem: React.FC<Props> = ({ review }: Props) => {
+export const SearchReviewItem: React.FC<Props> = ({ review }: Props) => {
 
-  const createdAt = moment(review.createdAt.toDate()).format("YYYY/M/D");
+  // const createdAt = moment(review.createdAt.toDate()).format("YYYY/M/D");
 
   return (
     <View style={styles.container}>
       <View style={styles.leftContainer}>
+        <Text style={styles.shopText}>{review.shop.name}</Text>
         <View>
           <Stars score={review.score} starSize={16} textSize={12} />
           <Text style={styles.reviewText}>{review.text}</Text>
         </View>
-        <Text style={styles.nameText}>{`${review.user.name}  ${createdAt}`}</Text>
+        <Text style={styles.nameText}>{`${review.user.name}`}</Text>
       </View>
       <View style={styles.rightContainer}>
         <Image style={styles.image} source={{uri: review.imageUrl}} />
@@ -54,4 +55,10 @@ const styles = StyleSheet.create({
     color: "#888",
     fontSize: 12,
   },
+  shopText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#000",
+  }
 });
+
