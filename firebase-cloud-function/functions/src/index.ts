@@ -4,14 +4,13 @@ import { User } from "./types/user";
 import { Review } from "./types/review";
 import { Shop } from "./types/shop";
 import admin = require("firebase-admin");
+import algoliasearch from "algoliasearch";
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
+const ALGOLIA_ID = functions.config().algolia.id;
+const ALGOLIA_ADMIN_KEY = functions.config().algolia.key;
 
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+const client = algoliasearch(ALGOLIA_ID, ALGOLIA_ADMIN_KEY);
+const index = client.initIndex("reviews");
 
 admin.initializeApp();
 
@@ -39,12 +38,11 @@ exports.onUpdateUser = functions
     }
   });
 
-
 exports.onWriteReview = functions
   .region("asia-northeast1")
   .firestore.document("shops/{shopId}/reviews/{reviewId}")
   .onWrite(async (change, context) => {
-    const { shopId } = context.params;
+    const { shopId, reviewId } = context.params;
     const review = change.after.data() as Review;
     const db = admin.firestore();
     try {
@@ -99,6 +97,10 @@ exports.onWriteReview = functions
       }
       await shopRef.update(params);
 
+      index.saveObject({
+        objectID: reviewId,
+        ...review,
+      });
     } catch (err) {
       console.log(err);
     }
